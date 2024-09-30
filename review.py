@@ -5,7 +5,8 @@ import PySimpleGUI as sg
 review_file = 'review_list.txt'
 
 # ユーザーが選べる選択肢
-choices = ['追加', '表示', '編集', '削除', '終了']
+choices = ['追加', '表示', '編集', 'ソート', '削除', '終了']
+sort_options = ['昇順', '降順']
 
 # GUIレイアウト
 layout = [
@@ -49,6 +50,14 @@ def edit_review(reviews, index, date, name, rating, comment):
         save_reviews(reviews)    # 更新後のリストを保存
     else:
         print("指定されたインデックスは無効です")
+
+def sort_low_review(reviews):
+    reviews.sort(key=lambda x: x.split('｜')[2].replace("評価： ", ""))  # 評価順に昇順ソート
+
+def sort_high_review(reviews):
+    # 評価部分だけを抽出してソート
+    reviews.sort(key=lambda x: x.split('｜')[2].replace("評価： ", ""), reverse=True)  # 評価順に降順ソート
+    
 
 
 # レビューを削除する関数
@@ -196,6 +205,14 @@ while True:
             else:
                 win['output'].update("編集できるレビューが存在しません。")
 
+        elif choice == 'ソート':
+            sort_choice = sg.popup_get_text("ソート方法を選んでください（昇順/降順）： ")
+            if sort_choice == '昇順':
+                sort_low_review(reviews)
+            elif sort_choice == '降順':
+                sort_high_review(reviews)
+            display_text = "\n------------------------------------------------------------------------------\n".join([f"{i}： {review}" for i, review in enumerate(reviews, 1)])
+            win['output'].update(display_text)
 
 
         elif choice == '削除':
