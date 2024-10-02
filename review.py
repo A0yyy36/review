@@ -5,7 +5,7 @@ import PySimpleGUI as sg
 review_file = 'review_list.txt'
 
 # ユーザーが選べる選択肢
-choices = ['追加', '表示', '編集', 'ソート', '削除', '終了']
+choices = ['追加', '表示', '編集', '並べ替え', '削除', '終了']
 sort_options = ['昇順', '降順']
 
 # GUIレイアウト
@@ -135,7 +135,7 @@ while True:
 
         elif choice == '編集':
             if reviews:  # レビューが存在するか確認
-                index_str = sg.popup_get_text("編集するレビュー番号を入力してください: ")
+                index_str = sg.popup_get_text("編集するレビュー番号を入力してください: ", title='Edit')
                 if index_str and index_str.isdigit():
                     index = int(index_str) - 1  # 1から始まる番号を0から始まるインデックスに変換
                     if 0 <= index < len(reviews):  # 有効なインデックスか確認
@@ -205,8 +205,8 @@ while True:
             else:
                 win['output'].update("編集できるレビューが存在しません。")
 
-        elif choice == 'ソート':
-            sort_choice = sg.popup_get_text("ソート方法を選んでください（昇順/降順）： ")
+        elif choice == '並べ替え':
+            sort_choice = sg.popup_get_text("評価の並べ替え方法を選んでください（昇順／降順）： ", title="Sort")
             if sort_choice == '昇順':
                 sort_low_review(reviews)
             elif sort_choice == '降順':
@@ -214,6 +214,8 @@ while True:
             display_text = "\n------------------------------------------------------------------------------\n".join([f"{i}： {review}" for i, review in enumerate(reviews, 1)])
             win['output'].update(display_text)
 
+            if sort_choice != '降順' and sort_choice != '昇順':
+                win['output'].update("無効な方法です。")
 
         elif choice == '削除':
             # 指定したレビューを削除
