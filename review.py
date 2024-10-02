@@ -37,26 +37,26 @@ def save_reviews(reviews):
             file.write("------------------------------------------------------------------------\n")
 
 # レビューを追加する関数
-def add_review(reviews, date, name, rating, comment):
-    review = f"日時： {date}｜名前： {name}｜評価： {rating}｜感想： {comment}"
+def add_review(reviews, date, name, typing, rating, comment):
+    review = f"日時： {date}｜名前： {name}｜種類： {typing}｜評価： {rating}｜感想： {comment}"
     reviews.append(review)
     save_reviews(reviews)
 
 # レビューを編集する関数
-def edit_review(reviews, index, date, name, rating, comment):
+def edit_review(reviews, index, date, name, typing, rating, comment):
     if 0 <= index < len(reviews):  # インデックスが有効か確認
-        review = f"日時： {date}｜名前： {name}｜評価： {rating}｜感想： {comment}"
+        review = f"日時： {date}｜名前： {name}｜種類： {typing}｜評価： {rating}｜感想： {comment}"
         reviews[index] = review  # 指定したインデックスのレビューを更新
         save_reviews(reviews)    # 更新後のリストを保存
     else:
         print("指定されたインデックスは無効です")
 
 def sort_low_review(reviews):
-    reviews.sort(key=lambda x: x.split('｜')[2].replace("評価： ", ""))  # 評価順に昇順ソート
+    reviews.sort(key=lambda x: x.split('｜')[3].replace("評価： ", ""))  # 評価順に昇順ソート
 
 def sort_high_review(reviews):
     # 評価部分だけを抽出してソート
-    reviews.sort(key=lambda x: x.split('｜')[2].replace("評価： ", ""), reverse=True)  # 評価順に降順ソート
+    reviews.sort(key=lambda x: x.split('｜')[3].replace("評価： ", ""), reverse=True)  # 評価順に降順ソート
     
 
 
@@ -89,6 +89,32 @@ while True:
             if name is None:  # キャンセルが押されたら選択画面に戻る
                 continue
 
+            types = ['小説', 'ビジネス書', '専門書', '実用書']
+            layout_type = [
+                [sg.Text("ジャンルを選んでください")],
+                [sg.Combo(types, key='types', size=(42, 1), readonly=True)],  # コンボボックスに変更
+                [sg.Button('Ok', size=(6, 1), key='confirm'), sg.Button('Cancel', size=(6, 1), key='cancel')]
+            ]
+
+            type_win = sg.Window('genre', layout_type)
+
+            while True:
+                event_type, values_type = type_win.read()
+                
+                if event_type == sg.WIN_CLOSED or event_type == 'cancel':
+                    type_win.close()
+                    typing = None  # キャンセルが押されたらNoneにする
+                    break
+
+                elif event_type == 'confirm' and values_type['types']:
+                    typing = values_type['types']  # 選択された種類を取得
+                    type_win.close()
+                    break
+
+            if typing is None:  # キャンセルが押されたら選択画面に戻る
+                continue
+
+
             # 星評価の選択ボックスをコンボボックスで表示
             stars = ['☆1', '☆2', '☆3', '☆4', '☆5']
             layout_rating = [
@@ -120,8 +146,8 @@ while True:
             if comment is None:  # キャンセルが押されたら選択画面に戻る
                 continue
 
-            if date and name and rating and comment:
-                add_review(reviews, date, name, rating, comment)
+            if date and name and typing and rating and comment:
+                add_review(reviews, date, name, typing, rating, comment)
                 win['output'].update("レビューが追加されました。")
             else:
                 win['output'].update("全てのフィールドを入力してください。")
@@ -146,8 +172,9 @@ while True:
                         parts = current_review.split('｜')
                         date = parts[0].replace("日時： ", "")
                         name = parts[1].replace("名前： ", "")
-                        rating = parts[2].replace("評価： ", "")
-                        comment = parts[3].replace("感想： ", "")
+                        typing = parts[2].replace("種類： ", "")
+                        rating = parts[3].replace("評価： ", "")
+                        comment = parts[4].replace("感想： ", "")
 
                         # 日時入力 (元の内容を初期値として表示)
                         date = sg.popup_get_text("読み終えた日時(YYYY/MM/DD)： ", title="Date", default_text=date)
@@ -158,6 +185,35 @@ while True:
                         name = sg.popup_get_text("本の名前： ", title="Name", default_text=name)
                         if name is None:  # キャンセルが押されたら選択画面に戻る
                             continue
+
+
+                        # 種類の選択ボックスをコンボボックスで表示 (元の種類を初期値として設定)
+                        types = ['小説', 'ビジネス書', '専門書', '実用書']
+                        layout_type = [
+                            [sg.Text("ジャンルを選んでください")],
+                            [sg.Combo(types, key='types', size=(42, 1), readonly=True, default_value=typing)],  # デフォルト値に元の評価をセット
+                            [sg.Button('Ok', size=(6, 1), key='confirm'), sg.Button('Cancel', size=(6, 1), key='cancel')]
+                        ]
+
+                        type_win = sg.Window('genre', layout_type)
+
+                        # 星評価の入力処理
+                        while True:
+                            event_type, values_type = type_win.read()
+                            
+                            if event_type == sg.WIN_CLOSED or event_type == 'cancel':
+                                type_win.close()
+                                typing = None  # キャンセルが押されたらNoneにする
+                                break
+
+                            elif event_type == 'confirm' and values_type['types']:
+                                typing = values_type['types']  # 選択された評価を取得
+                                type_win.close()
+                                break
+
+                        if typing is None:  # キャンセルが押されたら選択画面に戻る
+                            continue
+
 
                         # 星評価の選択ボックスをコンボボックスで表示 (元の評価を初期値として設定)
                         stars = ['☆1', '☆2', '☆3', '☆4', '☆5']
@@ -194,7 +250,7 @@ while True:
                         # 全てのフィールドが入力されている場合、レビューを編集する
                         if date and name and rating and comment:
                             # ここで編集されたレビューを保存する
-                            edit_review(reviews, index, date, name, rating, comment)
+                            edit_review(reviews, index, date, name, typing, rating, comment)
                             win['output'].update("レビューが編集されました。")
                         else:
                             win['output'].update("全てのフィールドを入力してください。")
