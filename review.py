@@ -94,7 +94,7 @@ while True:
             if name is None:  # キャンセルが押されたら選択画面に戻る
                 continue
 
-            types = ['小説', 'ビジネス書', '専門書', '実用書']
+            types = ['小説', '漫画', '参考書', '自己啓発']
             layout_type = [
                 [sg.Text("ジャンルを選んでください")],
                 [sg.Combo(types, key='types', size=(42, 1), readonly=True)],  # コンボボックスに変更
@@ -193,7 +193,7 @@ while True:
 
 
                         # 種類の選択ボックスをコンボボックスで表示 (元の種類を初期値として設定)
-                        types = ['小説', 'ビジネス書', '専門書', '実用書']
+                        types = ['小説', '漫画', '参考書', '自己啓発']
                         layout_type = [
                             [sg.Text("ジャンルを選んでください")],
                             [sg.Combo(types, key='types', size=(42, 1), readonly=True, default_value=typing)],  # デフォルト値に元の評価をセット
@@ -268,11 +268,11 @@ while True:
 
 
         elif choice == '探索':
-            search_choice = sg.popup_get_text("表示する本の種類を選んでください（小説／ビジネス書／専門書／実用書）： ", title="Search")
+            search_choice = sg.popup_get_text("表示する本の種類を選んでください（小説／漫画／参考書／自己啓発）： ", title="Search")
             result = search_review(reviews, search_choice)
             if result:
                 display_text = "\n------------------------------------------------------------------------------\n".join([f"{i}： {result}" for i, result in enumerate(result, start=1)])  # 1から始める
-            elif search_choice != '小説' and search_choice != 'ビジネス書' and search_choice != '専門書' and search_choice != '実用書':
+            elif search_choice != '小説' and search_choice != '漫画' and search_choice != '参考書' and search_choice != '自己啓発':
                 display_text = "そのような本の種類はありません。"
             else:
                 display_text = "該当するレビューが見つかりませんでした。"
