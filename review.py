@@ -5,7 +5,7 @@ import PySimpleGUI as sg
 review_file = 'review_list.txt'
 
 # ユーザーが選べる選択肢
-choices = ['追加', '表示', '編集', '並べ替え', '削除', '終了']
+choices = ['追加', '表示', '編集', '探索', '並べ替え', '削除', '終了']
 sort_options = ['昇順', '降順']
 
 # GUIレイアウト
@@ -51,11 +51,16 @@ def edit_review(reviews, index, date, name, typing, rating, comment):
     else:
         print("指定されたインデックスは無効です")
 
+
+def search_review(reviews, target_type):
+    filtered_reviews = [review for review in reviews if review.split('｜')[2].replace("種類： ", "") == target_type]
+    return filtered_reviews
+
+
 def sort_low_review(reviews):
     reviews.sort(key=lambda x: x.split('｜')[3].replace("評価： ", ""))  # 評価順に昇順ソート
 
 def sort_high_review(reviews):
-    # 評価部分だけを抽出してソート
     reviews.sort(key=lambda x: x.split('｜')[3].replace("評価： ", ""), reverse=True)  # 評価順に降順ソート
     
 
@@ -96,7 +101,7 @@ while True:
                 [sg.Button('Ok', size=(6, 1), key='confirm'), sg.Button('Cancel', size=(6, 1), key='cancel')]
             ]
 
-            type_win = sg.Window('genre', layout_type)
+            type_win = sg.Window('Genre', layout_type)
 
             while True:
                 event_type, values_type = type_win.read()
@@ -195,7 +200,7 @@ while True:
                             [sg.Button('Ok', size=(6, 1), key='confirm'), sg.Button('Cancel', size=(6, 1), key='cancel')]
                         ]
 
-                        type_win = sg.Window('genre', layout_type)
+                        type_win = sg.Window('Genre', layout_type)
 
                         # 星評価の入力処理
                         while True:
@@ -260,6 +265,21 @@ while True:
                     win['output'].update("有効な番号を入力してください。")
             else:
                 win['output'].update("編集できるレビューが存在しません。")
+
+
+        elif choice == '探索':
+            search_choice = sg.popup_get_text("表示する本の種類を選んでください（小説／ビジネス書／専門書／実用書）： ", title="Search")
+            result = search_review(reviews, search_choice)
+            if result:
+                display_text = "\n------------------------------------------------------------------------------\n".join([f"{i}： {result}" for i, result in enumerate(result, start=1)])  # 1から始める
+            elif search_choice != '小説' and search_choice != 'ビジネス書' and search_choice != '専門書' and search_choice != '実用書':
+                display_text = "そのような本の種類はありません。"
+            else:
+                display_text = "該当するレビューが見つかりませんでした。"
+            
+            win['output'].update(display_text)
+            
+        
 
         elif choice == '並べ替え':
             sort_choice = sg.popup_get_text("評価の並べ替え方法を選んでください（昇順／降順）： ", title="Sort")
