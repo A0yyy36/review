@@ -58,70 +58,9 @@
    4. ファイルの構造
    記録は'review_list.txt'に以下の形式で保存されます．
    ```markdown
-   日時: YYYY/MM/DD｜名前: 書籍名｜評価: ☆1~5｜感想: 感想文
-   ----------------------------------------------------------
+   日時: YYYY/MM/DD｜名前: 書籍名｜種類: 書籍の種類｜評価: ☆1~☆5｜感想: 感想文
+   ---------------------------------------------------------------------------
    ```
-
-## コードの説明
-1. 記録の読み込み: 'review_list.txt'ファイルが存在する場合，その内容を読み込みます．
-```python
-def load_reviews():
-    if os.path.exists(review_file):
-        with open(review_file, 'r') as file:
-            reviews = file.readlines()
-        reviews = [review.strip() for review in reviews if review.strip() != "------------------------------------------------------------------------"]
-    else:
-        reviews = []
-    return reviews
-```
-2. 記録の保存: リストに保存された記録を review_list.txt ファイルに書き込みます．
-```python
-def save_reviews(reviews):
-    with open(review_file, 'w') as file:
-        for review in reviews:
-            file.write(review + '\n')
-            file.write("------------------------------------------------------------------------\n")
-```
-3. 記録の追加・削除: 記録の追加・削除コマンドを作ります．
-```python
-def add_review(reviews, date, name, rating, comment):
-    review = f"日時: {date}｜名前: {name}｜評価: {rating}｜感想: {comment}"
-    reviews.append(review)
-    save_reviews(reviews)
-
-def delete_review(reviews, index):
-    if 0 <= index < len(reviews):
-        reviews.pop(index)
-        save_reviews(reviews)
-```
-4. メインプログラム: ユーザーからのコマンドを受け取り、それに応じて適切な処理を行います．
-```python
-def main():
-    reviews = load_reviews()
-
-    while True:
-        command = input("コマンドを入力してください(追加，表示，削除，終了): ")
-        if command == '終了':
-            break
-
-        elif command == '追加':
-            date = input("読み終えた日時(YYYY/MM/DD): ")
-            name = input("本の名前: ")
-            rating = input("評価(☆ 1~5): ☆ ")
-            comment = input("感想: ")
-            add_review(reviews, date, name, rating, comment)
-
-        elif command == '表示':
-            for i, review in enumerate(reviews):
-                print(f"{i}: {review}")
-
-        elif command == '削除':
-            index = int(input("削除するreviewの番号を入力してください: "))
-            delete_review(reviews, index)
-
-        else:
-            print("無効なコマンドです．")
-```
 
 ## 使用用途
 ### 読書記録の管理
