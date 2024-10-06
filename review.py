@@ -296,7 +296,7 @@ while True:
         elif choice == '削除':
             # 指定したレビューを削除
             if reviews:
-                index_str = sg.popup_get_text("削除するレビュー番号を入力してください: ")
+                index_str = sg.popup_get_text("削除するレビュー番号を入力してください: ", title="Delete")
                 if index_str and index_str.isdigit():
                     index = int(index_str) - 1  # 1から始まる番号を0から始まるインデックスに変換
                     if 0 <= index < len(reviews):
