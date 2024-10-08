@@ -1,0 +1,5 @@
+# `.gitattributes` ファイルの例: `.rb` ファイルを Java に分類する
+*.rb linguist-language=Python
+
+# 言語名の空白はハイフンに置換する
+*.glyphs linguist-language=OpenStep-Property-List
